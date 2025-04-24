@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService{
     @Override
     public UserDto updateUserById(UserDto userDto, Long userId) {
         userDto.setId(userId);
-        if (!isEmailUnique(userDto)) {
+        if (userDto.getEmail() != null && !isEmailUnique(userDto)) {
             throw new ValidationException(String.format(USER_WITH_SAME_EMAIL_ERR, userDto.getEmail()));
         }
         if (findUserById(userId) != null) {
@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService{
 
     private boolean isEmailUnique(UserDto user) {
        return findAllUsers().stream()
-               .noneMatch(u -> u.getEmail().equals(user.getEmail()) && u.getId().equals(user.getId()));
+               .noneMatch(u -> u.getEmail().equals(user.getEmail()) && !u.getId().equals(user.getId()));
 
     }
 }
