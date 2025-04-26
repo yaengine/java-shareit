@@ -10,12 +10,13 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.dto.UserDto;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ItemServiceImpl implements ItemService{
+public class ItemServiceImpl implements ItemService {
     private final ItemMapper itemMapper;
     private final UserMapper userMapper;
     private final ItemStorage itemStorage;
@@ -34,7 +35,7 @@ public class ItemServiceImpl implements ItemService{
     @Override
     public ItemDto updateItemById(ItemDto itemDto, Long userId, Long itemId) {
         if (isUserOwnerOfItem(itemId, userId)) {
-            return itemMapper.toItemDto(itemStorage.updateItemById(itemDto, itemId));
+            return itemMapper.toItemDto(itemStorage.updateItemById(itemMapper.toItem(itemDto), itemId));
         } else {
             throw new ValidationException(String.format("Вещь с id %d не принадлежит пользователю с id %d",
                     itemId, userId));
@@ -60,6 +61,9 @@ public class ItemServiceImpl implements ItemService{
 
     @Override
     public Collection<ItemDto> searchItemsByText(String text) {
+        if (text == null || text.isEmpty()) {
+            return new ArrayList<>();
+        }
         return itemStorage.searchItemsByText(text).stream()
                 .map(itemMapper::toItemDto)
                 .collect(Collectors.toList());

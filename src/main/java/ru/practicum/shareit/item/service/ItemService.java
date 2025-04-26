@@ -7,8 +7,12 @@ import java.util.Collection;
 
 public interface ItemService {
     ItemDto createItem(ItemDto itemDto, UserDto userDto);
+
     ItemDto updateItemById(ItemDto itemDto, Long userId, Long itemId);
+
     ItemDto findItemById(Long itemId);
+
     Collection<ItemDto> findAllByUserId(Long userId);
+
     Collection<ItemDto> searchItemsByText(String text);
 }

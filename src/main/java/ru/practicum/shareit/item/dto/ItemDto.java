@@ -1,10 +1,10 @@
 package ru.practicum.shareit.item.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import ru.practicum.shareit.request.ItemRequest;
-import ru.practicum.shareit.user.User;
+
 
 /**
  * TODO Sprint add-controllers.
@@ -17,7 +17,7 @@ public class ItemDto {
     String name;
     @NotBlank(message = "Описание не должно быть пустым")
     String description;
-    @NotBlank(message = "Вещь должна быть либо доступна для аренды либо нет")
+    @NotNull(message = "Вещь должна быть либо доступна для аренды либо нет")
     Boolean available;
     Long requestId;
 }
