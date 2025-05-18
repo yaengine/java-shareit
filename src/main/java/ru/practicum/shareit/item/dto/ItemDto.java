@@ -4,6 +4,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import ru.practicum.shareit.booking.dto.BookingDto;
+
+import java.util.List;
 
 @AllArgsConstructor
 @Data
@@ -16,4 +19,7 @@ public class ItemDto {
     @NotNull(message = "Вещь должна быть либо доступна для аренды либо нет")
     Boolean available;
     Long requestId;
+    BookingDto lastBooking;
+    BookingDto nextBooking;
+    List<CommentDto> comments;
 }

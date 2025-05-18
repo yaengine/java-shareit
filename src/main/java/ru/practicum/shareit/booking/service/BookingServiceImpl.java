@@ -1,7 +1,9 @@
 package ru.practicum.shareit.booking.service;
 
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingState;
 import ru.practicum.shareit.booking.BookingStatus;
@@ -11,6 +13,7 @@ import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dao.UserRepository;
@@ -30,8 +33,10 @@ public class BookingServiceImpl implements BookingService {
     private final BookingMapper bookingMapper;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    private final ItemMapper itemMapper;
 
     @Override
+    @Transactional
     public BookingDto createBooking(Long userId, BookingCreateDto bookingCreateDto) {
         Item item = itemRepository.findById(bookingCreateDto.getItemId()).orElseThrow(() ->
                 new NotFoundException(String.format(ITEM_NOT_FOUND_ERR, bookingCreateDto.getItemId())));
@@ -47,31 +52,33 @@ public class BookingServiceImpl implements BookingService {
                 .status(BookingStatus.WAITING)
                 .build();
 
-        return bookingMapper.toBookingDto(bookingRepository.save(booking));
+        return addItemDto(bookingRepository.save(booking));
     }
 
     @Override
+    @Transactional
     public BookingDto updateBookingStatus(Long userId, Long bookingId, Boolean isApproved) {
         Booking booking = getBookingByIdWithCheckAccess(userId, bookingId, "owner");
         booking.setStatus(isApproved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
 
-        return bookingMapper.toBookingDto(bookingRepository.save(booking));
+        return addItemDto(bookingRepository.save(booking));
     }
 
     @Override
     public BookingDto findBookingById(Long userId, Long bookingId) {
-        return bookingMapper.toBookingDto(getBookingByIdWithCheckAccess(userId, bookingId, "ownerOrBooker"));
+        return addItemDto(getBookingByIdWithCheckAccess(userId, bookingId, "ownerOrBooker"));
     }
 
     @Override
     public List<BookingDto> findBookingsByBookerId(Long bookerId, BookingState state) {
         return bookingRepository.findByBookerId(bookerId).stream()
                 .filter(b -> checkByState(b, state))
-                .map(bookingMapper::toBookingDto)
+                .map(this::addItemDto)
                 .toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingDto> findBookingsByOwnerId(Long ownerId, BookingState state) {
         userRepository.findById(ownerId).orElseThrow(() ->
                 new NotFoundException(String.format(USER_NOT_FOUND_ERR, ownerId)));
@@ -79,7 +86,7 @@ public class BookingServiceImpl implements BookingService {
         return bookingRepository.findByItemOwnerId(ownerId)
                 .stream()
                 .filter(b -> checkByState(b, state))
-                .map(bookingMapper::toBookingDto)
+                .map(this::addItemDto)
                 .toList();
     }
 
@@ -112,6 +119,14 @@ public class BookingServiceImpl implements BookingService {
             case WAITING -> booking.getStatus().equals(BookingStatus.WAITING);
             case REJECTED -> booking.getStatus().equals(BookingStatus.REJECTED);
         };
+    }
+
+    //Убираем ItemMapper из BookingMapper для избежания цикличной зависимости. Обогащаем BookingDto.
+    //@Lazy не помогла
+    private BookingDto addItemDto(Booking booking) {
+        BookingDto bookingDto = bookingMapper.toBookingDto(booking);
+        bookingDto.setItem(itemMapper.toItemDto(booking.getItem()));
+        return bookingDto;
     }
 
 }

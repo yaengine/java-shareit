@@ -2,8 +2,11 @@ package ru.practicum.shareit.item.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -25,4 +28,7 @@ public class Item {
     @OneToOne
     @JoinColumn(name = "request_id")
     ItemRequest request;
+    @OneToMany(mappedBy = "item")
+    @OrderBy("start")
+    List<Booking> bookings;
 }

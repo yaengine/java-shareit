@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service;
 
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.dto.UserDto;
 
@@ -15,4 +16,6 @@ public interface ItemService {
     Collection<ItemDto> findAllByUserId(Long userId);
 
     Collection<ItemDto> searchItemsByText(String text);
+
+    CommentDto createComment(Long userId, CommentDto commentDto, Long itemId);
 }

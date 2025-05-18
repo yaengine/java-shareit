@@ -2,12 +2,12 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.dao.UserRepository;
-import ru.practicum.shareit.user.dao.UserStorage;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.Collection;
@@ -38,6 +38,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto createUser(UserDto userDto) {
         if (isEmailUnique(userDto)) {
             return userMapper.toUserDto(userRepository.save(userMapper.toUser(userDto)));
@@ -47,19 +48,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto updateUserById(UserDto userDto, Long userId) {
         userDto.setId(userId);
         if (userDto.getEmail() != null && !isEmailUnique(userDto)) {
             throw new ValidationException(String.format(USER_WITH_SAME_EMAIL_ERR, userDto.getEmail()));
         }
-        if (findUserById(userId) != null) {
-            return userMapper.toUserDto(userRepository.save(userMapper.toUser(userDto)));
-        } else {
-            throw new NotFoundException(String.format(USER_NOT_FOUND_ERR, userId));
-        }
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException(String.format(USER_NOT_FOUND_ERR, userId)));
+
+        User newUser = userMapper.toUser(userDto);
+        newUser.setEmail(newUser.getEmail() != null ? newUser.getEmail() : user.getEmail());
+        newUser.setName(newUser.getName() != null ? newUser.getName() : user.getName());
+        return userMapper.toUserDto(userRepository.save(newUser));
     }
 
     @Override
+    @Transactional
     public void deleteUser(Long userId) {
         if (findUserById(userId) != null) {
             userRepository.deleteById(userId);
