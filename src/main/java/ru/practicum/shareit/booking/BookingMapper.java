@@ -7,12 +7,10 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.user.UserMapper;
 
-@Lazy
 @Component
 @RequiredArgsConstructor
 public class BookingMapper {
 
-   // private final ItemMapper itemMapper;
     private final UserMapper userMapper;
 
     public BookingDto toBookingDto(Booking booking) {
@@ -20,7 +18,6 @@ public class BookingMapper {
                 .id(booking.getId())
                 .start(booking.getStart())
                 .end(booking.getEnd())
-                //.item(itemMapper.toItemDto(booking.getItem()))
                 .booker(userMapper.toUserDto(booking.getBooker()))
                 .status(booking.getStatus())
                 .build();
