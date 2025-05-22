@@ -6,4 +6,5 @@ public class Constants {
     public static final String USER_WITH_SAME_EMAIL_ERR = "Пользователь с email %s уже существует";
     public static final String BOOKING_NOT_FOUND_ERR = "Бронирование с id %d не найдено";
     public static final String ITEM_NOT_FOUND_ERR = "Вещь с id %d не найдена";
+    public static final String ITEM_REQUEST_NOT_FOUND_ERR = "Запрос с id %d не найден";
 }

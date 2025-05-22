@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -8,6 +9,7 @@ import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.dao.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
 
 import java.time.LocalDateTime;
@@ -15,13 +17,10 @@ import java.util.Comparator;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class ItemMapper {
-
     private final BookingMapper bookingMapper;
-
-    public ItemMapper(BookingMapper bookingMapper) {
-        this.bookingMapper = bookingMapper;
-    }
+    private final ItemRequestRepository itemRequestRepository;
 
     public ItemDto toItemDto(Item item) {
         return new ItemDto(
@@ -50,12 +49,18 @@ public class ItemMapper {
     }
 
     public Item toItem(ItemDto itemDto) {
-        return Item.builder()
+        Item.ItemBuilder itemBuilder =  Item.builder()
                 .id(itemDto.getId())
                 .name(itemDto.getName())
                 .description(itemDto.getDescription())
-                .available(itemDto.getAvailable())
-                .build();
+                .available(itemDto.getAvailable());
+
+        if (itemDto.getRequestId() != null) {
+            itemBuilder.request(itemRequestRepository.findById(itemDto.getRequestId()).orElse(null));
+        }
+
+        return itemBuilder.build();
+
     }
 
     public CommentDto toCommentDto(Comment comment) {

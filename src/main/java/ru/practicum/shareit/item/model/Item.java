@@ -3,7 +3,7 @@ package ru.practicum.shareit.item.model;
 import jakarta.persistence.*;
 import lombok.*;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.User;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public class Item {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     User owner;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "request_id")
     ItemRequest request;
     @OneToMany(mappedBy = "item")
