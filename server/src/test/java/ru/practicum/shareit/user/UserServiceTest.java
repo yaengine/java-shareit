@@ -7,6 +7,8 @@ import ru.practicum.shareit.ShareItServer;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = ShareItServer.class)
@@ -15,10 +17,20 @@ public class UserServiceTest {
     private UserService userService;
 
     @Test
+    void findUsers() {
+        UserDto userDto = UserDto.builder()
+                .name("userName1")
+                .email("userName1@ya.ru")
+                .build();
+        List<UserDto> users = (List<UserDto>) userService.findAllUsers();
+        assertFalse(users.isEmpty(), "Пользователи не нашелись");
+    }
+
+    @Test
     void createUser() {
         UserDto userDto = UserDto.builder()
-                .name("userName")
-                .email("userName@ya.ru")
+                .name("userName2")
+                .email("userName2@ya.ru")
                 .build();
         UserDto user = userService.createUser(userDto);
         assertTrue(user.getId() > 0, "Пользователь не создался");
@@ -27,8 +39,8 @@ public class UserServiceTest {
     @Test
     void updateUser() {
         UserDto userDto = UserDto.builder()
-                .name("userName")
-                .email("userName@ya.ru")
+                .name("userName3")
+                .email("userName3@ya.ru")
                 .build();
         UserDto user = userService.createUser(userDto);
         user.setName("newName");
@@ -39,8 +51,8 @@ public class UserServiceTest {
     @Test
     void updateUserWhoNotExist() {
         UserDto userDto = UserDto.builder()
-                .name("userName")
-                .email("userName@ya.ru")
+                .name("userName4")
+                .email("userName4@ya.ru")
                 .build();
         assertThrows(Exception.class, () -> userService.updateUserById(userDto, userDto.getId()),
                 "Несуществующего пользователя не должно обновлять");
@@ -49,8 +61,8 @@ public class UserServiceTest {
     @Test
     void deleteUser() {
         UserDto userDto = UserDto.builder()
-                .name("userName")
-                .email("userName@ya.ru")
+                .name("userName5")
+                .email("userName5@ya.ru")
                 .build();
         UserDto user = userService.createUser(userDto);
 
