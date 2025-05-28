@@ -65,11 +65,13 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BookingDto findBookingById(Long userId, Long bookingId) {
         return addItemDto(getBookingByIdWithCheckAccess(userId, bookingId, "ownerOrBooker"));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingDto> findBookingsByBookerId(Long bookerId, BookingState state) {
         return bookingRepository.findByBookerId(bookerId).stream()
                 .filter(b -> checkByState(b, state))

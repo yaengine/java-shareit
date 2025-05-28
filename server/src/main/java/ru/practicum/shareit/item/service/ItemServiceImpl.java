@@ -67,6 +67,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ItemDto findItemById(Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new ValidationException(String.format(ITEM_NOT_FOUND_ERR, itemId)));
@@ -77,6 +78,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Collection<ItemDto> findAllByUserId(Long userId) {
         return itemRepository.findByOwnerId(userId).stream()
                 .map(i -> {
@@ -89,6 +91,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Collection<ItemDto> searchItemsByText(String text) {
         if (text == null || text.isEmpty()) {
             return new ArrayList<>();
