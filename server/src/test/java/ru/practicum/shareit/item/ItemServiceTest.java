@@ -170,7 +170,7 @@ public class ItemServiceTest {
                 .end(LocalDateTime.now().plusMinutes(1))
                 .build();
 
-        BookingDto newBooking = bookingService.createBooking(bookingCreateDto.getItemId(), bookingCreateDto);
+        BookingDto newBooking = bookingService.createBooking(user.getId(), bookingCreateDto);
 
         CommentDto comment = CommentDto.builder()
                 .text("commentText")
