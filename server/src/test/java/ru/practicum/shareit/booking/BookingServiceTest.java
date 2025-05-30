@@ -103,6 +103,19 @@ public class BookingServiceTest {
     }
 
     @Test
+    void createBookingWithoutItem() {
+        BookingCreateDto bookingCreateDto = BookingCreateDto.builder()
+                .itemId(0L)
+                .start(LocalDateTime.now())
+                .end(LocalDateTime.now().plusMinutes(1))
+                .build();
+
+        assertThrows(Exception.class,
+                () -> bookingService.createBooking(bookingCreateDto.getItemId(), bookingCreateDto),
+                "Бронирование не существующей вещью не должно сработать");
+    }
+
+    @Test
     void updateBookingStatus() {
         UserDto userDto = UserDto.builder()
                 .name("userName3b")
@@ -177,7 +190,7 @@ public class BookingServiceTest {
                 .build();
         BookingDto newBooking = bookingService.createBooking(user.getId(), bookingCreateDto);
 
-        List<BookingDto> bookings = bookingService.findBookingsByBookerId(user.getId(), BookingState.ALL);
+        List<BookingDto> bookings = bookingService.findBookingsByOwnerId(user.getId(), BookingState.ALL);
         assertFalse(bookings.isEmpty(), "Бронирования не нашлись");
     }
 
