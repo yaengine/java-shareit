@@ -90,4 +90,12 @@ class UserControllerTest {
 
         verify(userService, times(1)).deleteUser(userId);
     }
+
+    @Test
+    void getUserByIdWIthWrongId_shouldReturnBadRequest() throws Exception {
+        when(userService.findUserById(userId)).thenReturn(testUser);
+
+        mockMvc.perform(get("/users/{id}", "AAA"))
+                .andExpect(status().isBadRequest());
+    }
 }

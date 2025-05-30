@@ -37,6 +37,17 @@ public class UserServiceTest {
     }
 
     @Test
+    void createUserWithWrongEmail() {
+        UserDto userDto = UserDto.builder()
+                .name("userName2e")
+                .email("userName2e@ya.ru")
+                .build();
+        UserDto user = userService.createUser(userDto);
+        assertThrows(Exception.class, () -> userService.createUser(userDto),
+                "Создался пользователь с существующим email");
+    }
+
+    @Test
     void updateUser() {
         UserDto userDto = UserDto.builder()
                 .name("userName3")
