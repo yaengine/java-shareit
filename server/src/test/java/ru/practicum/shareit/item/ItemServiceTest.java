@@ -110,6 +110,34 @@ public class ItemServiceTest {
     }
 
     @Test
+    void updateItemOtherUser() {
+        UserDto userDto = UserDto.builder()
+                .name("userName3i1")
+                .email("userName3i1@ya.ru")
+                .build();
+        UserDto user = userService.createUser(userDto);
+
+        UserDto userDto1 = UserDto.builder()
+                .name("userName3i2")
+                .email("userName3i2@ya.ru")
+                .build();
+        UserDto user1 = userService.createUser(userDto1);
+
+        ItemDto itemDto = ItemDto.builder()
+                .name("item3iNam1e")
+                .description("item3idescription1")
+                .available(true)
+                .build();
+
+        ItemDto newItem = itemService.createItem(itemDto, user);
+        newItem.setName("item3NameNew1");
+
+        assertThrows(Exception.class,
+                () -> itemService.updateItemById(newItem, user1.getId(), newItem.getId()),
+                "Обновление вещи другого пользователя не должно сработать");
+    }
+
+    @Test
     void findAllByUserId() {
         UserDto userDto = UserDto.builder()
                 .name("userName4i")
@@ -150,6 +178,12 @@ public class ItemServiceTest {
     }
 
     @Test
+    void searchItemsByTextWithEmptyText() {
+        List<ItemDto> items = (List<ItemDto>) itemService.searchItemsByText(null);
+        assertTrue(items.isEmpty(), "Вещи нашлись");
+    }
+
+    @Test
     void createComment() {
         UserDto userDto = UserDto.builder()
                 .name("userName6i")
@@ -178,9 +212,55 @@ public class ItemServiceTest {
                 .created(LocalDateTime.now())
                 .build();
 
-        CommentDto newCommnet = itemService.createComment(user.getId(), comment, newItem.getId());
+        CommentDto newCommnent = itemService.createComment(user.getId(), comment, newItem.getId());
 
-        assertEquals("commentText", newCommnet.getText(), "Комментарий не создался");
+        assertEquals("commentText", newCommnent.getText(), "Комментарий не создался");
+    }
+
+    @Test
+    void createCommentWithoutUser() {
+        UserDto userDto = UserDto.builder()
+                .name("userName6i1")
+                .email("userName6i1@ya.ru")
+                .build();
+        UserDto user = userService.createUser(userDto);
+
+        ItemDto itemDto = ItemDto.builder()
+                .name("item61Name")
+                .description("item61description")
+                .available(true)
+                .build();
+        ItemDto newItem = itemService.createItem(itemDto, user);
+
+        CommentDto comment = CommentDto.builder()
+                .text("commentText")
+                .authorName(user.getName())
+                .created(LocalDateTime.now())
+                .build();
+
+        assertThrows(Exception.class,
+                () -> itemService.createComment(0L, comment, newItem.getId()),
+                "Создание комментария не существующего пользователя не должно сработать");
+    }
+
+    @Test
+    void createCommentWitWrongItem() {
+        UserDto userDto = UserDto.builder()
+                .name("userName6i2")
+                .email("userName6i2@ya.ru")
+                .build();
+        UserDto user = userService.createUser(userDto);
+
+
+        CommentDto comment = CommentDto.builder()
+                .text("commentText")
+                .authorName(user.getName())
+                .created(LocalDateTime.now())
+                .build();
+
+        assertThrows(Exception.class,
+                () -> itemService.createComment(user.getId(), comment, 0L),
+                "Создание комментария не существующего пользователя не должно сработать");
     }
 
 }
