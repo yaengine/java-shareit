@@ -169,6 +169,141 @@ public class BookingServiceTest {
     }
 
     @Test
+    void findBookingsByBookerIdWithStateCURRENT() {
+        UserDto userDto = UserDto.builder()
+                .name("userName4b1")
+                .email("userName4b1@ya.ru")
+                .build();
+        UserDto user = userService.createUser(userDto);
+
+        ItemDto itemDto = ItemDto.builder()
+                .name("item4b1Name")
+                .description("item4b1description")
+                .available(true)
+                .build();
+        ItemDto newItem = itemService.createItem(itemDto, user);
+
+        BookingCreateDto bookingCreateDto = BookingCreateDto.builder()
+                .itemId(newItem.getId())
+                .start(LocalDateTime.now())
+                .end(LocalDateTime.now().plusMinutes(1))
+                .build();
+        bookingService.createBooking(user.getId(), bookingCreateDto);
+
+        List<BookingDto> bookings = bookingService.findBookingsByBookerId(user.getId(), BookingState.CURRENT);
+
+        assertTrue(bookings.isEmpty(), "Бронирования нашлись");
+    }
+
+    @Test
+    void findBookingsByBookerIdWithStatePAST() {
+        UserDto userDto = UserDto.builder()
+                .name("userName4b2")
+                .email("userName4b2@ya.ru")
+                .build();
+        UserDto user = userService.createUser(userDto);
+
+        ItemDto itemDto = ItemDto.builder()
+                .name("item4b2Name")
+                .description("item4b2description")
+                .available(true)
+                .build();
+        ItemDto newItem = itemService.createItem(itemDto, user);
+
+        BookingCreateDto bookingCreateDto = BookingCreateDto.builder()
+                .itemId(newItem.getId())
+                .start(LocalDateTime.now())
+                .end(LocalDateTime.now().plusMinutes(1))
+                .build();
+        bookingService.createBooking(user.getId(), bookingCreateDto);
+
+        List<BookingDto> bookings = bookingService.findBookingsByBookerId(user.getId(), BookingState.PAST);
+
+        assertTrue(bookings.isEmpty(), "Бронирования нашлись");
+    }
+
+    @Test
+    void findBookingsByBookerIdWithStateFUTURE() {
+        UserDto userDto = UserDto.builder()
+                .name("userName4b3")
+                .email("userName4b3@ya.ru")
+                .build();
+        UserDto user = userService.createUser(userDto);
+
+        ItemDto itemDto = ItemDto.builder()
+                .name("item4b3Name")
+                .description("item4b3description")
+                .available(true)
+                .build();
+        ItemDto newItem = itemService.createItem(itemDto, user);
+
+        BookingCreateDto bookingCreateDto = BookingCreateDto.builder()
+                .itemId(newItem.getId())
+                .start(LocalDateTime.now())
+                .end(LocalDateTime.now().plusMinutes(1))
+                .build();
+        bookingService.createBooking(user.getId(), bookingCreateDto);
+
+        List<BookingDto> bookings = bookingService.findBookingsByBookerId(user.getId(), BookingState.FUTURE);
+
+        assertTrue(bookings.isEmpty(), "Бронирования нашлись");
+    }
+
+    @Test
+    void findBookingsByBookerIdWithStateWAITING() {
+        UserDto userDto = UserDto.builder()
+                .name("userName4b4")
+                .email("userName4b4@ya.ru")
+                .build();
+        UserDto user = userService.createUser(userDto);
+
+        ItemDto itemDto = ItemDto.builder()
+                .name("item4b4Name")
+                .description("item4b4description")
+                .available(true)
+                .build();
+        ItemDto newItem = itemService.createItem(itemDto, user);
+
+        BookingCreateDto bookingCreateDto = BookingCreateDto.builder()
+                .itemId(newItem.getId())
+                .start(LocalDateTime.now())
+                .end(LocalDateTime.now().plusMinutes(1))
+                .build();
+        bookingService.createBooking(user.getId(), bookingCreateDto);
+
+        List<BookingDto> bookings = bookingService.findBookingsByBookerId(user.getId(), BookingState.WAITING);
+
+        assertFalse(bookings.isEmpty(), "Бронирования нашлись");
+    }
+
+    @Test
+    void findBookingsByBookerIdWithStateREJECTED() {
+        UserDto userDto = UserDto.builder()
+                .name("userName4b5")
+                .email("userName4b5@ya.ru")
+                .build();
+        UserDto user = userService.createUser(userDto);
+
+        ItemDto itemDto = ItemDto.builder()
+                .name("item4b5Name")
+                .description("item4b5description")
+                .available(true)
+                .build();
+        ItemDto newItem = itemService.createItem(itemDto, user);
+
+        BookingCreateDto bookingCreateDto = BookingCreateDto.builder()
+                .itemId(newItem.getId())
+                .start(LocalDateTime.now())
+                .end(LocalDateTime.now().plusMinutes(1))
+                .build();
+        bookingService.createBooking(user.getId(), bookingCreateDto);
+
+        List<BookingDto> bookings = bookingService.findBookingsByBookerId(user.getId(), BookingState.REJECTED);
+
+        assertTrue(bookings.isEmpty(), "Бронирования нашлись");
+    }
+
+    @Test
     void findBookingsByOwnerId() {
         UserDto userDto = UserDto.builder()
                 .name("userName5b")
@@ -194,4 +329,10 @@ public class BookingServiceTest {
         assertFalse(bookings.isEmpty(), "Бронирования не нашлись");
     }
 
+    @Test
+    void findBookingsByOwnerIdWithWrongUser() {
+        assertThrows(Exception.class,
+                () -> bookingService.findBookingsByOwnerId(0L, BookingState.ALL),
+                "Поиск с не существующим пользователем не должно сработать");
+    }
 }
