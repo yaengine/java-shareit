@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = ShareItServer.class)
 public class UserServiceTest {
-   @Autowired
+    @Autowired
     private UserService userService;
 
     @Test

@@ -15,4 +15,8 @@ class ShareItTests {
         assertThat(context).isNotNull();
     }
 
+    @Test
+    public void testMain() {
+        ShareItServer.main(new String[]{});
+    }
 }
